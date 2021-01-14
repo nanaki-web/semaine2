@@ -84,20 +84,45 @@ ORDER BY cat_name ASC
 
 -- Q10. Afficher l'organigramme hiérarchique (nom et prénom et poste des employés) du magasin de Compiègne, classer par ordre alphabétique. Afficher le nom et prénom des employés, éventuellement le poste (si vous y parvenez).
 
-SELECT emp_superior_id,emp_lastname,emp_firstname
-FROM employees
-
-SELECT emp_lastname,emp_firstname
-FROM employees
-
-SELECT concat (emp_lastname,' ',emp_firstname)as 'employé' , concat (emp_superior_id,' ',emp_lastname,' ',emp_firstname)AS 'supérieur'
-FROM employees
+SELECT concat(A.emp_lastname,' ',A.emp_firstname) AS 'superior' ,concat (B.emp_lastname,' ',B.emp_firstname) AS 'employes'
+FROM employees A
+JOIN employees B 
+ON A.emp_id = B.emp_superior_id
+JOIN shops
+ON B.emp_sho_id = sho_id 
+WHERE sho_city = 'Compiègne'
+ORDER BY employes ASC
 
 -- Fonctions d'agrégation
 -- Q11. Quel produit a été vendu avec la remise la plus élevée ? Afficher le montant de la remise, le numéro et le nom du produit, le numéro de commande et de ligne de commande.
+SELECT CONCAT ("Il s'agit du produit ",pro_id,"(",cat_name,") ligne de commande ",ode_id,"commande ",ode_ord_id )
+FROM categories
+JOIN products 
+ON categories.cat_id = products.pro_id 
+JOIN orders_details
+ON products.pro_id = orders_details.ode_pro_id
+JOIN orders
+ON orders_details.ode_ord_id = orders.ord_id
+WHERE ode_discount = (SELECT MAX(ode_discount)
+       FROM orders_details)
 
-SELECT MAX(ode_discount),ode_pro_id,pro_name,ord_id
-FROM orders_details,products,orders
+-- Q13. Combien y-a-t-il de clients canadiens ? Afficher dans une colonne intitulée 'Nb clients Canada'
+
+SELECT CONCAT (COUNT(*)," clients viennent du Canada")
+FROM customers
+WHERE cus_countries_id="CA"
+
+-- Q16. Afficher le détail des commandes de 2020.
+
+SELECT ode_id,ode_unit_price,ode_discount,ode_quantity,ode_ord_id,ode_pro_id,ord_order_date
+FROM orders_details
+JOIN orders ON orders_details.ode_ord_id=orders.ord_id
+WHERE ord_order_date LIKE '%2020%'
+
+-- Q17. Afficher les coordonnées des fournisseurs pour lesquels des commandes ont été passées.
+
+
+
 
 
 
