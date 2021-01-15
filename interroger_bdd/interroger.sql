@@ -121,6 +121,69 @@ WHERE ord_order_date LIKE '%2020%'
 
 -- Q17. Afficher les coordonnées des fournisseurs pour lesquels des commandes ont été passées.
 
+SELECT s.sup_name,s.sup_address,s.sup_zipcode
+FROM suppliers s
+WHERE s.sup_id IN(SELECT p.pro_sup_id FROM products p)
+
+-- Q18. Quel est le chiffre d'affaires de 2020 ?
+
+SELECT COUNT (((ode_unit_price * ode_quantity)*1.20 )- ode_discount) as ' Chiffre moyen  '
+FROM orders_details
+WHERE ode_ord_id = (SELECT ord_id FROM orders WHERE ord_order_date = 2020)
+
+-- bonne reponse
+
+SELECT ROUND(SUM((ode_unit_price-(ode_unit_price*ode_discount/100))*ode_quantity),2) as ' Chiffre moyen  '
+FROM orders_details
+WHERE ode_ord_id IN(SELECT ord_id FROM orders WHERE YEAR( ord_order_date )= 2020)
+
+
+-- Q19. Quel est le panier moyen ?
+
+SELECT AVG((od.ode_unit_price-(od.ode_unit_price*od.ode_discount/100))*od.ode_quantity) AS 'moyenne'
+FROM orders_details od
+GROUP BY od.ode_ord_id
+
+-- Q20. Lister le total de chaque commande par total décroissant (Afficher numéro de commande, date, total et nom du client).
+
+
+
+
+
+-- Q22. La version 2020 du produit barb004 s'appelle désormais Camper et, bonne nouvelle, son prix subit une baisse de 10%.
+
+SELECT   pro_id,pro_price,pro_price,(pro_price - (pro_price * 10 /100)) AS 'total')
+FROM products
+where pro_id = 12 
+
+
+-- Q23. L'inflation en France en 2019 a été de 1,1%, appliquer cette augmentation à la gamme de parasols.
+
+SELECT  pro_id,pro_price,pro_price,(pro_price+(pro_price * 1.1 /100)) AS 'total'
+FROM products
+JOIN categories
+ON products.pro_cat_id = categories.cat_id
+WHERE categories.cat_name = 'parasols' 
+
+-- Q24. Supprimer les produits non vendus de la catégorie "Tondeuses électriques". Vous devez utilisez une sous-requête sans indiquer de valeurs de clés.
+
+SELECT products.pro_name 
+FROM products
+where (SELECT ode_pro_id FROM orders_details 
+WHERE products.pro_cat_id IN (SELECT categories.cat_id FROM categories WHERE categories.cat_name = 'Tondeuses électriques') )
+
+
+delete from products
+
+
+
+
+
+
+
+
+
+
 
 
 
